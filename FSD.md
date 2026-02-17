@@ -95,7 +95,7 @@ PiVault is designed as a modular, containerized system running on Raspberry Pi O
 
 | Layer | Technology | Version / Notes |
 |-------|-----------|----------------|
-| Operating System | Raspberry Pi OS Lite (64-bit, Bookworm) | Headless, no desktop |
+| Operating System | Raspberry Pi OS Lite (64-bit, Trixie) | Headless, no desktop |
 | Containerization | Docker + Docker Compose | Container orchestration |
 | Web Server / Proxy | Nginx | Reverse proxy, TLS termination, static files |
 | Backend API | Node.js + Express | REST API for all dashboard services |
@@ -526,8 +526,8 @@ Development is organized into four phases, each building on the previous. Each p
 
 ### 7.1 Phase 1 Detail: Foundation
 
-- [ ] Flash Raspberry Pi OS Lite (64-bit Bookworm) to microSD
-- [ ] Configure headless access: SSH keys, static IP, hostname
+- [x] Flash Raspberry Pi OS Lite (64-bit Trixie) to microSD
+- [x] Configure headless access: SSH, WiFi, hostname (pivault)
 - [ ] Attach and format external USB HDD with LUKS encryption + ext4
 - [ ] Configure auto-mount with `crypttab` and `fstab`
 - [x] Install Docker and Docker Compose; create project `docker-compose.yml`
@@ -547,14 +547,14 @@ Development is organized into four phases, each building on the previous. Each p
 - [x] Create dashboard layout shell (sidebar, topbar, responsive)
 - [x] Implement dark/light theme toggle with system detection
 - [x] Create placeholder pages for all 6 navigation sections
-- [ ] Build system health panel with live CPU, RAM, disk, uptime data
+- [x] Build system health panel with live CPU, RAM, disk, uptime data
 - [ ] Create ESP32 weather ingest API endpoint (`POST /api/v1/weather/ingest`)
 - [ ] Set up InfluxDB for time-series weather data storage
 - [ ] Build real-time weather gauge widgets (temperature, humidity, pressure, wind)
 - [ ] Implement interactive trend charts with zoom/pan and time range selection
 - [ ] Add min/max/avg summary cards for weather data
 - [ ] Build weather data export (CSV/JSON)
-- [ ] Connect frontend to live API data (replace placeholder values)
+- [x] Connect frontend to live API data (system health from Pi)
 - [ ] **Validate:** weather data flows from ESP32 → API → InfluxDB → dashboard charts
 
 ---
