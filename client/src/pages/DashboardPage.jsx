@@ -1,29 +1,17 @@
 import NeuCard from '../components/ui/NeuCard'
-import { HiOutlineUpload, HiOutlineVideoCamera, HiOutlineFilm } from 'react-icons/hi'
 import NeuButton from '../components/ui/NeuButton'
+import SystemHealthPanel from '../components/widgets/SystemHealthPanel'
+import { HiOutlineUpload, HiOutlineVideoCamera, HiOutlineFilm } from 'react-icons/hi'
 
 export default function DashboardPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6 text-[var(--neu-text)] lg:hidden">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {/* System Health */}
-        <NeuCard className="md:col-span-2 xl:col-span-2">
-          <h2 className="font-semibold mb-4 text-[var(--neu-accent)]">System Health</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'CPU Temp', value: '42°C' },
-              { label: 'RAM', value: '512 / 1024 MB' },
-              { label: 'Disk', value: '1.2 / 2.0 TB' },
-              { label: 'Uptime', value: '14d 6h' },
-            ].map(({ label, value }) => (
-              <div key={label} className="neu-inset p-4 text-center">
-                <p className="text-xs text-[var(--neu-text-muted)]">{label}</p>
-                <p className="text-lg font-bold mt-1">{value}</p>
-              </div>
-            ))}
-          </div>
-        </NeuCard>
+        {/* System Health — LIVE */}
+        <div className="md:col-span-2 xl:col-span-3">
+          <SystemHealthPanel />
+        </div>
 
         {/* Weather */}
         <NeuCard>

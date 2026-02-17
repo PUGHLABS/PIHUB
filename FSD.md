@@ -526,18 +526,36 @@ Development is organized into four phases, each building on the previous. Each p
 
 ### 7.1 Phase 1 Detail: Foundation
 
-1. Flash Raspberry Pi OS Lite (64-bit Bookworm) to microSD
-2. Configure headless access: SSH keys, static IP, hostname
-3. Attach and format external USB HDD with LUKS encryption + ext4
-4. Configure auto-mount with `crypttab` and `fstab`
-5. Install Docker and Docker Compose; create project `docker-compose.yml`
-6. Deploy Samba container with authenticated user shares
-7. Deploy Nginx container with self-signed TLS (upgrade to Let's Encrypt later)
-8. Build Node.js + Express API container with JWT authentication
-9. Create initial SQLite database schema (users, sessions, config)
-10. Deploy WireGuard for secure remote access
-11. Set up ufw firewall rules and Fail2ban
-12. **Validate:** file upload/download via SMB and web, remote VPN access
+- [ ] Flash Raspberry Pi OS Lite (64-bit Bookworm) to microSD
+- [ ] Configure headless access: SSH keys, static IP, hostname
+- [ ] Attach and format external USB HDD with LUKS encryption + ext4
+- [ ] Configure auto-mount with `crypttab` and `fstab`
+- [x] Install Docker and Docker Compose; create project `docker-compose.yml`
+- [ ] Deploy Samba container with authenticated user shares
+- [ ] Deploy Nginx container with self-signed TLS (upgrade to Let's Encrypt later)
+- [x] Build Node.js + Express API container with JWT authentication
+- [x] Create initial SQLite database schema (users, sessions, config)
+- [ ] Deploy WireGuard for secure remote access
+- [ ] Set up ufw firewall rules and Fail2ban
+- [ ] **Validate:** file upload/download via SMB and web, remote VPN access
+
+### 7.2 Phase 2 Detail: Dashboard + Weather
+
+- [x] Scaffold React + Tailwind frontend with Vite
+- [x] Implement neumorphic design system (CSS tokens, utility classes)
+- [x] Build reusable UI primitives (NeuCard, NeuButton, NeuInput, Skeleton)
+- [x] Create dashboard layout shell (sidebar, topbar, responsive)
+- [x] Implement dark/light theme toggle with system detection
+- [x] Create placeholder pages for all 6 navigation sections
+- [ ] Build system health panel with live CPU, RAM, disk, uptime data
+- [ ] Create ESP32 weather ingest API endpoint (`POST /api/v1/weather/ingest`)
+- [ ] Set up InfluxDB for time-series weather data storage
+- [ ] Build real-time weather gauge widgets (temperature, humidity, pressure, wind)
+- [ ] Implement interactive trend charts with zoom/pan and time range selection
+- [ ] Add min/max/avg summary cards for weather data
+- [ ] Build weather data export (CSV/JSON)
+- [ ] Connect frontend to live API data (replace placeholder values)
+- [ ] **Validate:** weather data flows from ESP32 → API → InfluxDB → dashboard charts
 
 ---
 
