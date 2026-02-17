@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+/* ---- Neumorphic Design Tokens ---- */
+:root {
+  --neu-bg: #e0e0e0;
+  --neu-shadow-light: #ffffff;
+  --neu-shadow-dark: #bebebe;
+  --neu-distance: 10px;
+  --neu-blur: 20px;
+  --neu-radius: 16px;
+  --neu-text: #333333;
+  --neu-text-muted: #777777;
+  --neu-accent: #6c63ff;
+  --neu-accent-hover: #5a52d5;
+}
+
+.dark {
+  --neu-bg: #2d2d2d;
+  --neu-shadow-light: #383838;
+  --neu-shadow-dark: #222222;
+  --neu-text: #e0e0e0;
+  --neu-text-muted: #999999;
+  --neu-accent: #7c73ff;
+  --neu-accent-hover: #6c63ff;
+}
+
+/* ---- Base Styles ---- */
+body {
+  background-color: var(--neu-bg);
+  color: var(--neu-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ---- Neumorphic Utility Classes ---- */
+
+/* Extruded (raised) — cards, panels */
+.neu-flat {
+  background: var(--neu-bg);
+  border-radius: var(--neu-radius);
+  box-shadow:
+    var(--neu-distance) var(--neu-distance) var(--neu-blur) var(--neu-shadow-dark),
+    calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) var(--neu-shadow-light);
+}
+
+/* Inset (pressed) — inputs, active states */
+.neu-inset {
+  background: var(--neu-bg);
+  border-radius: var(--neu-radius);
+  box-shadow:
+    inset var(--neu-distance) var(--neu-distance) var(--neu-blur) var(--neu-shadow-dark),
+    inset calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) var(--neu-shadow-light);
+}
+
+/* Subtle extruded — smaller elements, list items */
+.neu-subtle {
+  background: var(--neu-bg);
+  border-radius: calc(var(--neu-radius) / 2);
+  box-shadow:
+    5px 5px 10px var(--neu-shadow-dark),
+    -5px -5px 10px var(--neu-shadow-light);
+}
+
+/* Button — extruded, inset on press */
+.neu-button {
+  background: var(--neu-bg);
+  border: none;
+  border-radius: var(--neu-radius);
+  box-shadow:
+    var(--neu-distance) var(--neu-distance) var(--neu-blur) var(--neu-shadow-dark),
+    calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) var(--neu-shadow-light);
+  transition: box-shadow 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+}
+
+.neu-button:hover {
+  color: var(--neu-accent);
+}
+
+.neu-button:active {
+  box-shadow:
+    inset var(--neu-distance) var(--neu-distance) var(--neu-blur) var(--neu-shadow-dark),
+    inset calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) var(--neu-shadow-light);
+}
