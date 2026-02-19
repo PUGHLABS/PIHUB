@@ -26,3 +26,12 @@ Thumbs.db
 
 # Docker volumes
 influxdb-data/
+
+# Large files / OS images
+*.img
+*.img.xz
+*.exe
+*.bin
+
+# Claude settings
+.claude/

@@ -92,7 +92,7 @@ PiVault is designed as a modular, containerized system running on Raspberry Pi O
 | The tools to use for hardware and software support are in file called resources.md |
 
 ### 2.3 Software Stack
-
+ 
 | Layer | Technology | Version / Notes |
 |-------|-----------|----------------|
 | Operating System | Raspberry Pi OS Lite (64-bit, Trixie) | Headless, no desktop |

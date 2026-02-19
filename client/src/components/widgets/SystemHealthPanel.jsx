@@ -40,7 +40,7 @@ function ProgressRing({ percent, size = 80, stroke = 6, color = 'var(--neu-accen
   )
 }
 
-function HealthGauge({ label, value, unit, percent, color }) {
+function HealthGauge({ label, value, subValue, percent, color }) {
   return (
     <div className="neu-inset p-4 flex flex-col items-center gap-2">
       <div className="relative">
@@ -50,7 +50,8 @@ function HealthGauge({ label, value, unit, percent, color }) {
         </div>
       </div>
       <p className="text-xs text-[var(--neu-text-muted)] uppercase tracking-wide">{label}</p>
-      <p className="text-sm font-medium">{value}{unit && <span className="text-[var(--neu-text-muted)]"> {unit}</span>}</p>
+      <p className="text-sm font-medium">{value}</p>
+      {subValue && <p className="text-sm font-bold text-[var(--neu-accent)]">{subValue}</p>}
     </div>
   )
 }
@@ -97,8 +98,8 @@ export default function SystemHealthPanel() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <HealthGauge
           label="CPU"
-          value={cpu.temperature != null ? `${cpu.temperature.toFixed(1)}°C` : `${cpu.usage}%`}
-          unit={cpu.temperature != null ? '' : 'usage'}
+          value={`${cpu.usage}% usage`}
+          subValue={cpu.temperature != null ? `${cpu.temperature.toFixed(1)}°C` : null}
           percent={cpu.usage}
           color={cpu.temperature != null ? tempColor : 'var(--neu-accent)'}
         />

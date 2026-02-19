@@ -1,6 +1,7 @@
 import NeuCard from '../components/ui/NeuCard'
 import NeuButton from '../components/ui/NeuButton'
 import SystemHealthPanel from '../components/widgets/SystemHealthPanel'
+import WeatherWidget from '../components/widgets/WeatherWidget'
 import { HiOutlineUpload, HiOutlineVideoCamera, HiOutlineFilm } from 'react-icons/hi'
 
 export default function DashboardPage() {
@@ -13,28 +14,8 @@ export default function DashboardPage() {
           <SystemHealthPanel />
         </div>
 
-        {/* Weather */}
-        <NeuCard>
-          <h2 className="font-semibold mb-4 text-[var(--neu-accent)]">Weather</h2>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-[var(--neu-text-muted)]">Temperature</span>
-              <span className="font-bold">22.5°C</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-[var(--neu-text-muted)]">Humidity</span>
-              <span className="font-bold">65%</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-[var(--neu-text-muted)]">Pressure</span>
-              <span className="font-bold">1013 hPa</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-[var(--neu-text-muted)]">Wind</span>
-              <span className="font-bold">12 km/h</span>
-            </div>
-          </div>
-        </NeuCard>
+        {/* Weather — LIVE from ESP32 */}
+        <WeatherWidget />
 
         {/* Cameras */}
         <NeuCard>
