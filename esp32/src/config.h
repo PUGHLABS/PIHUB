@@ -21,7 +21,7 @@
 
 // ---- Rain Gauge (tipping bucket reed switch) ----
 #define RAIN_PIN 17           // GPIO 17, reed switch to GND
-#define RAIN_ML_PER_CLICK 4.0 // Millilitres per reed switch closure
+#define RAIN_ML_PER_CLICK 4.25 // Millilitres per reed switch closure
 #define RAIN_DEBOUNCE_MS 50   // Ignore bounces shorter than this
 
 // ---- LED ----

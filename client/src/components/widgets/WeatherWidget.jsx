@@ -36,8 +36,28 @@ function BatteryIndicator({ voltage }) {
   )
 }
 
-function RainSection({ dailyMl, dailyClicks, lastReset }) {
+function RainSection({ dailyClicks, lastReset }) {
   const [zeroing, setZeroing] = useState(false)
+  const [calOpen, setCalOpen] = useState(false)
+  const [mlPerClick, setMlPerClick] = useState(() => {
+    const stored = localStorage.getItem('rain_ml_per_click')
+    return stored ? parseFloat(stored) : 4.25
+  })
+  const [calInput, setCalInput] = useState('')
+
+  function openCal() {
+    setCalInput(mlPerClick.toFixed(1))
+    setCalOpen(true)
+  }
+
+  function saveCal() {
+    const val = parseFloat(calInput)
+    if (!isNaN(val) && val > 0) {
+      localStorage.setItem('rain_ml_per_click', val.toString())
+      setMlPerClick(val)
+    }
+    setCalOpen(false)
+  }
 
   async function handleZero() {
     if (!confirm('Zero the daily rain totalizer?')) return
@@ -52,6 +72,8 @@ function RainSection({ dailyMl, dailyClicks, lastReset }) {
     }
   }
 
+  const displayMl = ((dailyClicks ?? 0) * mlPerClick).toFixed(1)
+
   const resetTime = lastReset
     ? new Date(lastReset).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : null
@@ -60,19 +82,41 @@ function RainSection({ dailyMl, dailyClicks, lastReset }) {
     <div className="mt-3 pt-3 border-t border-[var(--neu-shadow-dark)]">
       <div className="flex justify-between items-center mb-2">
         <span className="text-[var(--neu-text-muted)]">Rainfall (today)</span>
-        <span className="font-bold">{dailyMl ?? 0} ml</span>
+        <span className="font-bold">{displayMl} ml</span>
       </div>
+      {calOpen && (
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs text-[var(--neu-text-muted)]">ml/click:</span>
+          <input
+            className="neu-inset w-16 px-2 py-1 text-xs rounded-lg text-center"
+            value={calInput}
+            onChange={e => setCalInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && saveCal()}
+            autoFocus
+          />
+          <button onClick={saveCal} className="neu-button px-2 py-1 text-xs rounded-lg">Save</button>
+          <button onClick={() => setCalOpen(false)} className="neu-button px-2 py-1 text-xs rounded-lg">✕</button>
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <span className="text-xs text-[var(--neu-text-muted)]">
           {dailyClicks ?? 0} clicks {resetTime && `· reset ${resetTime}`}
         </span>
-        <button
-          onClick={handleZero}
-          disabled={zeroing}
-          className="neu-button px-2 py-1 text-xs rounded-lg disabled:opacity-50"
-        >
-          {zeroing ? 'Zeroing...' : 'Zero'}
-        </button>
+        <div className="flex gap-1">
+          <button
+            onClick={openCal}
+            className="neu-button px-2 py-1 text-xs rounded-lg"
+          >
+            Cal
+          </button>
+          <button
+            onClick={handleZero}
+            disabled={zeroing}
+            className="neu-button px-2 py-1 text-xs rounded-lg disabled:opacity-50"
+          >
+            {zeroing ? 'Zeroing...' : 'Zero'}
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -131,14 +175,31 @@ export default function WeatherWidget() {
       </div>
 
       <div className="space-y-3">
-        <WeatherRow label="Temperature" value={data.temperature_c} unit="°C" />
+        <WeatherRow
+          label="Temperature"
+          value={data.temperature_c != null
+            ? `${data.temperature_c}°C / ${((data.temperature_c * 9/5) + 32).toFixed(1)}°F`
+            : null}
+          unit=""
+        />
         <WeatherRow label="Humidity" value={data.humidity_pct} unit="%" />
-        <WeatherRow label="Pressure" value={data.pressure_hpa} unit=" hPa" />
-        <WeatherRow label="Wind" value={data.wind_speed_kmh} unit=" km/h" />
+        <WeatherRow
+          label="Pressure"
+          value={data.pressure_hpa != null
+            ? `${data.pressure_hpa} hPa / ${(data.pressure_hpa * 0.02953).toFixed(2)} inHg`
+            : null}
+          unit=""
+        />
+        <WeatherRow
+          label="Wind"
+          value={data.wind_speed_kmh != null
+            ? `${data.wind_speed_kmh} km/h / ${(data.wind_speed_kmh * 0.62137).toFixed(1)} mph`
+            : null}
+          unit=""
+        />
       </div>
 
       <RainSection
-        dailyMl={data.rain_daily_ml}
         dailyClicks={data.rain_daily_clicks}
         lastReset={data.rain_last_reset}
       />
