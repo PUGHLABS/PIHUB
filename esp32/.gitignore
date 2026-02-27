@@ -1,2 +1,5 @@
 .pio/
 firmware.bin
+
+# Contains WiFi credentials and API keys — do not commit
+src/config.h

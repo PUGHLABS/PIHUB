@@ -1,15 +1,18 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+// Copy this file to config.h and fill in your values.
+// config.h is gitignored — never commit real credentials.
+
 // ---- WiFi ----
-#define WIFI_SSID "cleopatra 2.4"
-#define WIFI_PASSWORD "Bullshit1!"
+#define WIFI_SSID "your-wifi-ssid"
+#define WIFI_PASSWORD "your-wifi-password"
 
 // ---- PiVault API ----
-#define API_HOST "pivault.local"
+#define API_HOST "192.168.0.22"        // Use IP, not .local (mDNS unreliable on some networks)
 #define API_PORT 3001
 #define API_ENDPOINT "/api/v1/weather/ingest"
-#define API_KEY "wx-station-01-key"
+#define API_KEY "your-api-key"         // Must match WX_API_KEY on server
 
 // ---- Station Identity ----
 #define STATION_ID "wx-station-01"

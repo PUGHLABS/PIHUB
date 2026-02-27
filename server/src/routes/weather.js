@@ -45,8 +45,9 @@ function validateReading(data) {
 // POST /api/v1/weather/ingest (API key auth)
 router.post('/ingest', (req, res) => {
   const apiKey = req.headers['x-api-key']
-  if (!apiKey) {
-    return res.status(401).json({ message: 'X-API-Key header required' })
+  const expectedKey = process.env.WX_API_KEY
+  if (!apiKey || (expectedKey && apiKey !== expectedKey)) {
+    return res.status(401).json({ message: 'Invalid or missing X-API-Key' })
   }
 
   const data = req.body
