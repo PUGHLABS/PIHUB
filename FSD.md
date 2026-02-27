@@ -548,14 +548,14 @@ Development is organized into four phases, each building on the previous. Each p
 - [x] Implement dark/light theme toggle with system detection
 - [x] Create placeholder pages for all 6 navigation sections
 - [x] Build system health panel with live CPU, RAM, disk, uptime data
-- [ ] Create ESP32 weather ingest API endpoint (`POST /api/v1/weather/ingest`)
-- [ ] Set up InfluxDB for time-series weather data storage
-- [ ] Build real-time weather gauge widgets (temperature, humidity, pressure, wind)
-- [ ] Implement interactive trend charts with zoom/pan and time range selection
-- [ ] Add min/max/avg summary cards for weather data
-- [ ] Build weather data export (CSV/JSON)
+- [x] Create ESP32 weather ingest API endpoint (`POST /api/v1/weather/ingest`)
+- [x] Set up SQLite time-series storage for weather data (InfluxDB optional upgrade path)
+- [x] Build real-time weather gauge widgets (temperature, humidity, pressure, wind, rain)
+- [x] Implement interactive trend charts with time range selection (1h/6h/24h/7d)
+- [x] Add min/max/avg summary cards for weather data
+- [x] Build weather data export (CSV/JSON)
 - [x] Connect frontend to live API data (system health from Pi)
-- [ ] **Validate:** weather data flows from ESP32 → API → InfluxDB → dashboard charts
+- [ ] **Validate:** weather data flows from ESP32 → API → SQLite → dashboard charts
 
 ---
 
