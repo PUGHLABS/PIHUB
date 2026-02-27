@@ -18,9 +18,10 @@
 | **Update Code**   | SSH (Pi) | `cd ~/PIHUB/server` then `git pull` |
 | **Power Down Pi** | SSH (Pi) | `sudo shutdown -h now` |
 | **curl http://192.168.0.22:3001/api/health** | PowerShell (PC) |
-| **cd "c:/!PROJECTS/HOME PROJECTS/PIHUB/esp32"
-pio run -t upload -e esp32** | PowerShell (PC) | `change firmware on ESP and flash via USB - note root!`
-|**ESP Serial port**| pio device monitor -b 115200**| ` watch data from ESP32
+| **cd "c:/!PROJECTS/HOME PROJECTS/PIHUB/esp32"**|
+| **pio run -t upload -e esp32** | `PowerShell (PC) | `change firmware on ESP and flash via USB - note root!`|
+| **ESP Serial port**| *watch data from ESP32*| `pio device monitor -b 115200 `|
+
 
 
 ---

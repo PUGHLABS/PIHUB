@@ -72,7 +72,11 @@ function RainSection({ dailyClicks, lastReset }) {
     }
   }
 
-  const displayMl = ((dailyClicks ?? 0) * mlPerClick).toFixed(1)
+  const rawMl = (dailyClicks ?? 0) * mlPerClick
+  const displayMl = rawMl.toFixed(1)
+  // Funnel: 6.25" × 6.25" → 15.875cm × 15.875cm = 252.0 cm²; depth_in = ml / (252.0 × 2.54)
+  const FUNNEL_AREA_CM2 = (6.25 * 2.54) ** 2
+  const displayInches = (rawMl / (FUNNEL_AREA_CM2 * 2.54)).toFixed(2)
 
   const resetTime = lastReset
     ? new Date(lastReset).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -82,7 +86,7 @@ function RainSection({ dailyClicks, lastReset }) {
     <div className="mt-3 pt-3 border-t border-[var(--neu-shadow-dark)]">
       <div className="flex justify-between items-center mb-2">
         <span className="text-[var(--neu-text-muted)]">Rainfall (today)</span>
-        <span className="font-bold">{displayMl} ml</span>
+        <span className="font-bold">{displayMl} ml / {displayInches}"</span>
       </div>
       {calOpen && (
         <div className="flex items-center gap-2 mb-2">
