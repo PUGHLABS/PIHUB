@@ -11,7 +11,8 @@ export default function useWeatherHistory(range = '24h', station = 'wx-station-0
       const res = await fetch(`/api/v1/weather/history?station=${station}&range=${range}&limit=300`)
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json = await res.json()
-      setData(json.data || [])
+      // Normalize: new server returns `time`, old server returns `received_at`
+      setData((json.data || []).map(d => ({ ...d, time: d.time ?? d.received_at })))
       setError(null)
     } catch (err) {
       setError(err.message)

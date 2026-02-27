@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import useWeatherStats from '../../hooks/useWeatherStats'
+import { useState, useMemo } from 'react'
+import useWeatherHistory from '../../hooks/useWeatherHistory'
 import Skeleton from '../ui/Skeleton'
 
 const RANGES = [
@@ -8,6 +8,19 @@ const RANGES = [
   { label: '24h', value: '24h' },
   { label: '7d', value: '7d' },
 ]
+
+function calcStats(data, key) {
+  const vals = data.map(d => d[key]).filter(v => v != null)
+  if (vals.length === 0) return { min: null, max: null, avg: null }
+  const min = Math.min(...vals)
+  const max = Math.max(...vals)
+  const avg = vals.reduce((s, v) => s + v, 0) / vals.length
+  return { min, max, avg }
+}
+
+function r(v, d = 1) {
+  return v != null ? Math.round(v * 10 ** d) / 10 ** d : null
+}
 
 function StatCard({ label, icon, min, max, avg, unit, color = 'var(--neu-accent)' }) {
   return (
@@ -48,24 +61,33 @@ function StatCard({ label, icon, min, max, avg, unit, color = 'var(--neu-accent)
 
 export default function WeatherStatsPanel() {
   const [range, setRange] = useState('24h')
-  const { data, loading, error } = useWeatherStats(range)
+  const { data: history, loading, error } = useWeatherHistory(range)
+
+  const stats = useMemo(() => {
+    if (!history.length) return null
+    const temp = calcStats(history, 'temperature_c')
+    const hum  = calcStats(history, 'humidity_pct')
+    const pres = calcStats(history, 'pressure_hpa')
+    const wind = calcStats(history, 'wind_speed_kmh')
+    return { temp, hum, pres, wind }
+  }, [history])
 
   return (
     <div className="neu-flat p-6">
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h2 className="font-semibold text-[var(--neu-accent)]">Summary Stats</h2>
         <div className="flex gap-1">
-          {RANGES.map(r => (
+          {RANGES.map(rv => (
             <button
-              key={r.value}
-              onClick={() => setRange(r.value)}
+              key={rv.value}
+              onClick={() => setRange(rv.value)}
               className={`px-3 py-1 text-xs rounded-lg font-medium transition-all ${
-                range === r.value
+                range === rv.value
                   ? 'neu-inset text-[var(--neu-accent)]'
                   : 'neu-button'
               }`}
             >
-              {r.label}
+              {rv.label}
             </button>
           ))}
         </div>
@@ -73,11 +95,7 @@ export default function WeatherStatsPanel() {
 
       {loading ? (
         <Skeleton lines={4} />
-      ) : error ? (
-        <div className="neu-inset p-4 rounded-xl text-center">
-          <p className="text-sm text-[var(--neu-text-muted)]">Stats unavailable</p>
-        </div>
-      ) : !data || data.samples === 0 ? (
+      ) : error || !stats ? (
         <div className="neu-inset p-4 rounded-xl text-center">
           <p className="text-sm text-[var(--neu-text-muted)]">No data for this period yet</p>
         </div>
@@ -86,45 +104,45 @@ export default function WeatherStatsPanel() {
           <StatCard
             label="Temperature"
             icon="🌡️"
-            min={data.temperature_c.min}
-            max={data.temperature_c.max}
-            avg={data.temperature_c.avg}
+            min={r(stats.temp.min)}
+            max={r(stats.temp.max)}
+            avg={r(stats.temp.avg)}
             unit="°C"
             color="#f59e0b"
           />
           <StatCard
             label="Humidity"
             icon="💧"
-            min={data.humidity_pct.min}
-            max={data.humidity_pct.max}
-            avg={data.humidity_pct.avg}
+            min={r(stats.hum.min)}
+            max={r(stats.hum.max)}
+            avg={r(stats.hum.avg)}
             unit="%"
             color="#3b82f6"
           />
           <StatCard
             label="Pressure"
             icon="🔵"
-            min={data.pressure_hpa.min}
-            max={data.pressure_hpa.max}
-            avg={data.pressure_hpa.avg}
+            min={r(stats.pres.min, 2)}
+            max={r(stats.pres.max, 2)}
+            avg={r(stats.pres.avg, 2)}
             unit=" hPa"
             color="#8b5cf6"
           />
           <StatCard
             label="Wind"
             icon="💨"
-            min={data.wind_speed_kmh.min}
-            max={data.wind_speed_kmh.max}
-            avg={data.wind_speed_kmh.avg}
+            min={r(stats.wind.min)}
+            max={r(stats.wind.max)}
+            avg={r(stats.wind.avg)}
             unit=" km/h"
             color="#10b981"
           />
         </div>
       )}
 
-      {data && data.samples > 0 && (
+      {stats && (
         <p className="text-xs text-[var(--neu-text-muted)] mt-3 text-right">
-          Based on {data.samples} readings
+          Based on {history.length} readings
         </p>
       )}
     </div>
