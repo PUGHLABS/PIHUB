@@ -43,12 +43,6 @@ void handleLedFlash() {
   }
 }
 
-// Battery voltage reading (ESP32 ADC on pin 34 for Wemos 18650 board)
-float readBatteryVoltage() {
-  int raw = analogRead(34);
-  // Wemos 18650 has a voltage divider: multiply by 2, scale 3.3V over 4095 steps
-  return (raw / 4095.0) * 3.3 * 2.0;
-}
 
 void connectWiFi() {
   Serial.printf("Connecting to WiFi: %s", WIFI_SSID);
@@ -102,20 +96,23 @@ void setupOTA() {
 bool initBME280() {
   Wire.begin(BME_SDA, BME_SCL);
 
-  if (bme.begin(BME_ADDRESS, &Wire)) {
-    Serial.println("BME280 found!");
-
-    bme.setSampling(
-      Adafruit_BME280::MODE_FORCED,
-      Adafruit_BME280::SAMPLING_X1,
-      Adafruit_BME280::SAMPLING_X1,
-      Adafruit_BME280::SAMPLING_X1,
-      Adafruit_BME280::FILTER_OFF
-    );
-    return true;
+  uint8_t addrs[] = {0x76, 0x77};
+  for (uint8_t addr : addrs) {
+    if (bme.begin(addr, &Wire)) {
+      Serial.printf("BME280 found at 0x%02X!\n", addr);
+      bme.setSampling(
+        Adafruit_BME280::MODE_FORCED,
+        Adafruit_BME280::SAMPLING_X1,
+        Adafruit_BME280::SAMPLING_X1,
+        Adafruit_BME280::SAMPLING_X1,
+        Adafruit_BME280::FILTER_OFF
+      );
+      return true;
+    }
+    Serial.printf("BME280 not at 0x%02X\n", addr);
   }
 
-  Serial.printf("BME280 not found at 0x%02X! Check wiring.\n", BME_ADDRESS);
+  Serial.println("BME280 not found! Check wiring.");
   return false;
 }
 
@@ -131,8 +128,6 @@ void postWeatherData() {
   float temperature = bme.readTemperature();
   float humidity = bme.readHumidity();
   float pressure = bme.readPressure() / 100.0;
-  float battery = readBatteryVoltage();
-
   if (isnan(temperature) || isnan(humidity) || isnan(pressure)) {
     Serial.println("Invalid BME280 reading, skipping...");
     return;
@@ -153,7 +148,7 @@ void postWeatherData() {
   doc["rainfall_ml"] = round(rainMl * 10) / 10.0;
   doc["rain_clicks"] = (long)currentClicks;
   doc["rain_delta_clicks"] = (long)deltaClicks;
-  doc["battery_v"] = round(battery * 100) / 100.0;
+  // battery_v omitted — WROOM-32 has no onboard ADC voltage divider
 
   clicksAtLastPost = currentClicks;
 

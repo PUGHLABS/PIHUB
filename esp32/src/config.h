@@ -17,7 +17,7 @@
 // ---- BME280 I2C Pins ----
 #define BME_SDA 21
 #define BME_SCL 22
-#define BME_ADDRESS 0x76 // Some modules use 0x77
+// Address auto-detected in initBME280() — 0x76 or 0x77
 
 // ---- Rain Gauge (tipping bucket reed switch) ----
 #define RAIN_PIN 17           // GPIO 17, reed switch to GND
@@ -25,7 +25,7 @@
 #define RAIN_DEBOUNCE_MS 50   // Ignore bounces shorter than this
 
 // ---- LED ----
-#define LED_PIN 16            // Wemos 18650 onboard LED (GPIO 16)
+#define LED_PIN 16            // Onboard blue LED (GPIO 16, active-low)
 #define LED_FLASH_MS 300      // How long to blink on rain click
 
 // ---- OTA ----

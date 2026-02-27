@@ -1,7 +1,7 @@
 # 🛠️ PiHub Development Cheat Sheet
 
 ## 🔗 Connection Quick-Start
-- **Server (Pi):** `ssh jeff@192.168.0.22`
+- **Server (Pi):** ` ssh  jeff@192.168.0.22`
 - **Client (PC):** `http://localhost:5173` (or 5174)
 
 ---
@@ -11,11 +11,17 @@
 
 | Task | Terminal | Command |
 | :--- | :--- | :--- |
-| **Start Website** | PowerShell (PC) | `cd client` then `npm run dev` |
+| **Start Website** | PowerShell (PC) | `cd client` then `npm run dev` | cd "C:\!PROJECTS\HOME PROJECTS\PIHUB\client" && npm run dev |
 | **See Live Logs** | SSH (Pi) | `pm2 logs pihub-server` |
 | **Check Status** | SSH (Pi) | `pm2 status` |
 | **Restart Server**| SSH (Pi) | `pm2 restart pihub-server` |
 | **Update Code**   | SSH (Pi) | `cd ~/PIHUB/server` then `git pull` |
+| **Power Down Pi** | SSH (Pi) | `sudo shutdown -h now` |
+| **curl http://192.168.0.22:3001/api/health** | PowerShell (PC) |
+| **cd "c:/!PROJECTS/HOME PROJECTS/PIHUB/esp32"
+pio run -t upload -e esp32** | PowerShell (PC) | `change firmware on ESP and flash via USB - note root!`
+|**ESP Serial port**| pio device monitor -b 115200**| ` watch data from ESP32
+
 
 ---
 
