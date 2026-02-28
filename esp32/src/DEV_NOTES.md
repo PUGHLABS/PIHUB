@@ -1,7 +1,7 @@
 # 🛠️ PiHub Development Cheat Sheet
 
 ## 🔗 Connection Quick-Start
-- **Server (Pi):** ` ssh  jeff@192.168.0.22`
+- **Server (Pi):** "to ssh in": ` ssh  jeff@192.168.0.22`
 - **Client (PC):** `http://localhost:5173` (or 5174)
 
 ---
@@ -23,6 +23,32 @@
 | **ESP Serial port**| *watch data from ESP32*| `pio device monitor -b 115200 `|
 
 
+
+---
+
+## 🔒 WireGuard VPN (Docker on Pi)
+
+| Task | Terminal | Command |
+| :--- | :--- | :--- |
+| **Start WireGuard** | SSH (Pi) | `cd ~/PIHUB && bash scripts/setup-wireguard.sh start` |
+| **Stop WireGuard** | SSH (Pi) | `bash scripts/setup-wireguard.sh stop` |
+| **Check status / handshakes** | SSH (Pi) | `bash scripts/setup-wireguard.sh status` |
+| **Show phone QR code** | SSH (Pi) | `bash scripts/setup-wireguard.sh qr phone` |
+| **Get laptop .conf file** | SSH (Pi) | `bash scripts/setup-wireguard.sh conf laptop` |
+| **List peer names** | SSH (Pi) | `bash scripts/setup-wireguard.sh peers` |
+| **Tail container logs** | SSH (Pi) | `bash scripts/setup-wireguard.sh logs` |
+| **Check Docker containers** | SSH (Pi) | `docker ps` |
+| **Restart WireGuard container** | SSH (Pi) | `docker compose -f ~/PIHUB/docker-compose.yml restart wireguard` |
+
+**First-time setup on Pi:**
+```bash
+cd ~/PIHUB
+cp .env.example .env       # edit with nano .env
+bash scripts/setup-wireguard.sh start
+bash scripts/setup-wireguard.sh qr phone    # scan with WireGuard app
+bash scripts/setup-wireguard.sh conf laptop # import on laptop
+```
+Router: Forward **UDP 51820 → 192.168.0.22** in port forwarding settings.
 
 ---
 
