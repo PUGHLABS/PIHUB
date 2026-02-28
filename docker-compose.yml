@@ -1,4 +1,8 @@
 services:
+
+  # ──────────────────────────────────────────────
+  # React frontend (Vite dev server)
+  # ──────────────────────────────────────────────
   client:
     build:
       context: .
@@ -11,7 +15,13 @@ services:
     environment:
       - VITE_API_URL=http://localhost:3001
     command: npm run dev -- --host
+    restart: unless-stopped
+    depends_on:
+      - server
 
+  # ──────────────────────────────────────────────
+  # Node.js + Express API
+  # ──────────────────────────────────────────────
   server:
     build:
       context: .
@@ -21,36 +31,60 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+      - server-data:/app/data
     environment:
       - PORT=3001
-      - JWT_SECRET=dev-secret-change-in-production
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-in-production}
+      - JWT_EXPIRY=${JWT_EXPIRY:-24h}
       - DB_PATH=/app/data/pivault.db
+      - WX_API_KEY=${WX_API_KEY:-}
     command: npm run dev
-    depends_on:
-      - influxdb
+    restart: unless-stopped
 
-  influxdb:
-    image: influxdb:2.7
-    ports:
-      - "8086:8086"
-    volumes:
-      - influxdb-data:/var/lib/influxdb2
-    environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=pivault
-      - DOCKER_INFLUXDB_INIT_PASSWORD=pivault-dev
-      - DOCKER_INFLUXDB_INIT_ORG=pivault
-      - DOCKER_INFLUXDB_INIT_BUCKET=weather
-
+  # ──────────────────────────────────────────────
+  # Nginx reverse proxy
+  # ──────────────────────────────────────────────
   nginx:
-    image: nginx:alpine
+    image: nginx:1.27-alpine
     ports:
       - "80:80"
     volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - client
       - server
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────
+  # WireGuard VPN
+  # ──────────────────────────────────────────────
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: pivault-wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-America/Los_Angeles}
+      - SERVERURL=${WG_SERVERURL:-auto}
+      - SERVERPORT=${WG_SERVERPORT:-51820}
+      - PEERS=${WG_PEERS:-laptop,phone}
+      - PEERDNS=${WG_PEERDNS:-auto}
+      - INTERNAL_SUBNET=${WG_INTERNAL_SUBNET:-10.13.13.0}
+      - ALLOWEDIPS=${WG_ALLOWEDIPS:-0.0.0.0/0}
+      - PERSISTENTKEEPALIVE_PEERS=${WG_KEEPALIVE:-all}
+      - LOG_CONFS=true
+    volumes:
+      - wg-config:/config
+      - /lib/modules:/lib/modules:ro
+    ports:
+      - "51820:51820/udp"
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
 
 volumes:
-  influxdb-data:
+  server-data:
+  wg-config:

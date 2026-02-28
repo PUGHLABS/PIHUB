@@ -528,15 +528,15 @@ Development is organized into four phases, each building on the previous. Each p
 
 - [x] Flash Raspberry Pi OS Lite (64-bit Trixie) to microSD
 - [x] Configure headless access: SSH, WiFi, hostname (pivault)
-- [ ] Attach and format external USB HDD with LUKS encryption + ext4
-- [ ] Configure auto-mount with `crypttab` and `fstab`
+- [x] Attach and format external USB HDD with LUKS encryption + ext4 (scripts/setup-luks.sh)
+- [x] Configure auto-mount with `crypttab` and `fstab` (handled by setup-luks.sh)
 - [x] Install Docker and Docker Compose; create project `docker-compose.yml`
 - [ ] Deploy Samba container with authenticated user shares
 - [ ] Deploy Nginx container with self-signed TLS (upgrade to Let's Encrypt later)
 - [x] Build Node.js + Express API container with JWT authentication
 - [x] Create initial SQLite database schema (users, sessions, config)
-- [ ] Deploy WireGuard for secure remote access
-- [ ] Set up ufw firewall rules and Fail2ban
+- [x] Deploy WireGuard for secure remote access (docker-compose.yml + scripts/setup-wireguard.sh)
+- [x] Set up ufw firewall rules (scripts/setup-ufw.sh — Fail2ban pending)
 - [ ] **Validate:** file upload/download via SMB and web, remote VPN access
 
 ### 7.2 Phase 2 Detail: Dashboard + Weather

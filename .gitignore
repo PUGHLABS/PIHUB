@@ -26,6 +26,10 @@ Thumbs.db
 
 # Docker volumes
 influxdb-data/
+wg-config/
+
+# WireGuard generated keys/configs (private keys — never commit)
+docker/wireguard/wg0.conf
 
 # Large files / OS images
 *.img
