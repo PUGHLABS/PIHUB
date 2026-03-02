@@ -126,7 +126,7 @@ info "LUKS UUID:  ${LUKS_UUID}"
 info "ext4 UUID:  ${EXT4_UUID}"
 
 # ── Step 8: /etc/crypttab ────────────────────────────────────────────────────
-CRYPTTAB_LINE="${MAPPER_NAME}  UUID=${LUKS_UUID}  none  luks,discard"
+CRYPTTAB_LINE="${MAPPER_NAME}  UUID=${LUKS_UUID}  none  luks,discard,initramfs"
 if grep -q "$LUKS_UUID" /etc/crypttab 2>/dev/null; then
     warn "crypttab entry already exists — skipping."
 else
