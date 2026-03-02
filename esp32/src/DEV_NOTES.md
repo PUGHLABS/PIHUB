@@ -52,13 +52,49 @@ Router: Forward **UDP 51820 → 192.168.0.22** in port forwarding settings.
 
 ---
 
+## 🔐 LUKS Encrypted Drive
+
+**Every reboot** — unlock the drive remotely (before SSH-ing in as jeff):
+```bash
+# From PC — wait ~30s after Pi powers on, then:
+ssh root@192.168.0.22 cryptroot-unlock
+# Enter LUKS passphrase → Pi finishes booting → re-SSH as jeff
+ssh jeff@192.168.0.22
+```
+
+| Task | Terminal | Command |
+| :--- | :--- | :--- |
+| **Verify NAS mounted** | SSH (Pi) | `df -h /mnt/nas` |
+| **Manual unlock** (if auto-mount failed) | SSH (Pi) | `sudo cryptsetup luksOpen /dev/sda pivault-hdd` |
+| **Manual mount** (after luksOpen) | SSH (Pi) | `sudo mount /mnt/nas` |
+| **Check LUKS status** | SSH (Pi) | `sudo cryptsetup status pivault-hdd` |
+| **Lock + unmount** (clean shutdown) | SSH (Pi) | `sudo umount /mnt/nas && sudo cryptsetup luksClose pivault-hdd` |
+| **List LUKS key slots** | SSH (Pi) | `sudo cryptsetup luksDump /dev/sda` |
+
+**First-time setup on Pi:**
+```bash
+sudo bash ~/PIHUB/scripts/setup-luks.sh      # format + mount drive
+sudo bash ~/PIHUB/scripts/setup-dropbear.sh  # enable remote unlock at boot
+sudo reboot
+# After reboot — from PC:
+ssh root@192.168.0.22 cryptroot-unlock
+```
+
+---
+
 ## 💡 Troubleshooting
-- **"Proxy Error" on Website?** 
+- **"Proxy Error" on Website?**
   Run `pm2 status` on the Pi. If it's not "online," run `pm2 restart pihub-server`.
-- **Weather Data Stopped?** 
+- **Weather Data Stopped?**
   Check `pm2 logs` to see if the ingest API is receiving data.
-- **Port 5173 in use?** 
+- **Port 5173 in use?**
   Vite will move to `5174`. Check the terminal for the new link.
+- **NAS not mounted after reboot?**
+  The LUKS drive needs the passphrase entered at boot via Dropbear.
+  Run `ssh root@192.168.0.22 cryptroot-unlock` from your PC right after reboot.
+  Or manually: `sudo cryptsetup luksOpen /dev/sda pivault-hdd && sudo mount /mnt/nas`
+- **Dropbear unlock says "Permission denied"?**
+  You're probably trying it on the running Pi (not at boot). Reboot first, wait 30s, then try.
 
 ---
 
