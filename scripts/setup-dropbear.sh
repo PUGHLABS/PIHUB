@@ -57,7 +57,8 @@ apt-get install -y dropbear-initramfs
 success "dropbear-initramfs installed."
 
 # ── Step 2: Copy authorized SSH key ──────────────────────────────────────────
-DROPBEAR_KEYS_DIR="/etc/dropbear/initramfs"
+# Debian's dropbear-initramfs package uses /etc/dropbear-initramfs/ (NOT /etc/dropbear/initramfs/)
+DROPBEAR_KEYS_DIR="/etc/dropbear-initramfs"
 mkdir -p "$DROPBEAR_KEYS_DIR"
 
 info "Copying SSH authorized_keys from: ${SSH_KEY_SOURCE}"
@@ -70,7 +71,7 @@ KEY_COUNT=$(wc -l < "${DROPBEAR_KEYS_DIR}/authorized_keys")
 info "${KEY_COUNT} key(s) authorized for remote unlock."
 
 # ── Step 3: Configure dropbear ────────────────────────────────────────────────
-DROPBEAR_CONF="${DROPBEAR_KEYS_DIR}/dropbear.conf"
+DROPBEAR_CONF="${DROPBEAR_KEYS_DIR}/config"
 info "Writing dropbear configuration ..."
 
 cat > "$DROPBEAR_CONF" <<'EOF'
