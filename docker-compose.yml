@@ -31,7 +31,9 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
-      - server-data:/app/data
+      # On the Pi: DB lives on the encrypted NAS drive.
+      # For local dev, fall back to named volume via: docker-compose.override.yml
+      - /mnt/nas/docker/server-data:/app/data
     environment:
       - PORT=3001
       - JWT_SECRET=${JWT_SECRET:-dev-secret-change-in-production}
@@ -42,17 +44,39 @@ services:
     restart: unless-stopped
 
   # ──────────────────────────────────────────────
-  # Nginx reverse proxy
+  # Nginx reverse proxy (HTTP + HTTPS)
   # ──────────────────────────────────────────────
   nginx:
     image: nginx:1.27-alpine
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - client
       - server
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────
+  # Samba NAS shares
+  # ──────────────────────────────────────────────
+  samba:
+    image: lscr.io/linuxserver/samba:latest
+    container_name: pivault-samba
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-America/Los_Angeles}
+    volumes:
+      - /mnt/nas:/mnt/nas
+      - ./docker/samba/smb.conf:/config/smb.conf:ro
+    ports:
+      - "445:445"
+      - "137:137/udp"
+      - "138:138/udp"
+      - "139:139/tcp"
     restart: unless-stopped
 
   # ──────────────────────────────────────────────
@@ -86,5 +110,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  server-data:
   wg-config:

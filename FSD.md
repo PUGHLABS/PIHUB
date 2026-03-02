@@ -530,9 +530,10 @@ Development is organized into four phases, each building on the previous. Each p
 - [x] Configure headless access: SSH, WiFi, hostname (pivault)
 - [x] Attach and format external USB HDD with LUKS encryption + ext4 (scripts/setup-luks.sh)
 - [x] Configure auto-mount with `crypttab` and `fstab` (handled by setup-luks.sh)
+- [x] Remote headless LUKS unlock via Dropbear SSH (scripts/setup-dropbear.sh)
 - [x] Install Docker and Docker Compose; create project `docker-compose.yml`
-- [ ] Deploy Samba container with authenticated user shares
-- [ ] Deploy Nginx container with self-signed TLS (upgrade to Let's Encrypt later)
+- [x] Deploy Samba container with authenticated user shares (docker/samba/smb.conf + scripts/setup-samba.sh)
+- [x] Deploy Nginx container with self-signed TLS (scripts/setup-tls.sh + docker/nginx/default.conf)
 - [x] Build Node.js + Express API container with JWT authentication
 - [x] Create initial SQLite database schema (users, sessions, config)
 - [x] Deploy WireGuard for secure remote access (docker-compose.yml + scripts/setup-wireguard.sh)

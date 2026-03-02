@@ -31,6 +31,9 @@ wg-config/
 # WireGuard generated keys/configs (private keys — never commit)
 docker/wireguard/wg0.conf
 
+# TLS certificates (generated on Pi by setup-tls.sh — never commit private keys)
+docker/nginx/certs/
+
 # Large files / OS images
 *.img
 *.img.xz

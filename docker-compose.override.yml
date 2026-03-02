@@ -1,0 +1,12 @@
+# Local development overrides
+# Docker Compose automatically merges this with docker-compose.yml.
+# Restores a named volume for server data so the API works without /mnt/nas.
+services:
+  server:
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+      - server-data:/app/data
+
+volumes:
+  server-data:
