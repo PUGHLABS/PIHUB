@@ -103,6 +103,32 @@ else
     warn "Could not verify dropbear in initramfs — check /boot/initrd.img manually."
 fi
 
+# ── Step 6: Copy initramfs to boot firmware partition (Pi-specific) ──────────
+# The Pi bootloader reads from /boot/firmware/ (FAT32), not /boot/ (ext4).
+# update-initramfs writes to /boot/, so we must copy it across.
+FIRMWARE_DIR="/boot/firmware"
+if [[ -d "$FIRMWARE_DIR" ]]; then
+    info "Copying initramfs to Pi boot partition (${FIRMWARE_DIR}) ..."
+    cp "$INITRD" "${FIRMWARE_DIR}/initrd.img-${KERNEL_VER}"
+    success "initramfs copied to ${FIRMWARE_DIR}."
+
+    # Add initramfs line to config.txt if not already present
+    CONFIG_TXT="${FIRMWARE_DIR}/config.txt"
+    INITRAMFS_LINE="initramfs initrd.img-${KERNEL_VER} followkernel"
+    if grep -q "^initramfs" "$CONFIG_TXT" 2>/dev/null; then
+        warn "initramfs line already in config.txt — updating it."
+        sed -i "s|^initramfs.*|${INITRAMFS_LINE}|" "$CONFIG_TXT"
+    else
+        echo "$INITRAMFS_LINE" >> "$CONFIG_TXT"
+        success "initramfs line added to config.txt."
+    fi
+else
+    warn "/boot/firmware not found — skipping Pi bootloader config."
+    warn "If using a Pi, manually copy ${INITRD} to your boot partition and add:"
+    warn "  initramfs initrd.img-${KERNEL_VER} followkernel"
+    warn "to /boot/firmware/config.txt"
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}${BOLD}════════════════════════════════════════════════════════${NC}"
