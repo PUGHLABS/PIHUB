@@ -13,7 +13,8 @@
 
 set -euo pipefail
 
-LUKS_DEVICE="/dev/sda"
+LUKS_UUID="4c4f63eb-acfa-4175-b87e-0e11f55edf0e"
+LUKS_DEVICE=$(blkid -l -t UUID="$LUKS_UUID" -o device 2>/dev/null || echo "/dev/sdc")
 MAPPER_NAME="pivault-hdd"
 MAPPER_PATH="/dev/mapper/${MAPPER_NAME}"
 MOUNT_POINT="/mnt/nas"
