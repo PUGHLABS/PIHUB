@@ -94,6 +94,7 @@ Login with user `jeff` and the Samba password set during setup.
 | **List Samba users** | SSH (Pi) | `sudo pdbedit -L` |
 | **Reset Samba password** | SSH (Pi) | `sudo smbpasswd jeff` |
 | **Test config** | SSH (Pi) | `testparm` |
+| **Tail Samba logs** | SSH (Pi) | `sudo journalctl -u smbd -f` |
 
 ---
 
