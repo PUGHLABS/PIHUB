@@ -75,7 +75,7 @@ router.get('/health', (req, res) => {
   const freeMem = os.freemem()
   const usedMem = totalMem - freeMem
   const uptimeSeconds = os.uptime()
-  const disk = getDiskUsage()
+  const disk = getDiskUsage('/mnt/nas')
 
   res.json({
     cpu: {

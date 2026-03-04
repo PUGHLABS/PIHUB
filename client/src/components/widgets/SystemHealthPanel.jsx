@@ -110,7 +110,7 @@ export default function SystemHealthPanel() {
           color={memColor}
         />
         <HealthGauge
-          label="Disk"
+          label="NAS"
           value={disk.total ? `${formatBytes(disk.used)} / ${formatBytes(disk.total)}` : '—'}
           percent={disk.percent}
           color={diskColor}
