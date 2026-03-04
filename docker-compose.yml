@@ -62,7 +62,7 @@ services:
   # Samba NAS shares
   # ──────────────────────────────────────────────
   samba:
-    image: lscr.io/linuxserver/samba:latest
+    image: linuxserver/samba:latest
     container_name: pivault-samba
     environment:
       - PUID=1000
