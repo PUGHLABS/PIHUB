@@ -88,6 +88,7 @@ JEFF_UID=$(id -u "$SAMBA_USER")
 JEFF_GID=$(id -g "$SAMBA_USER")
 
 info "Setting permissions on NAS directories ..."
+mkdir -p "${NAS_MOUNT}/nas/shared" "${NAS_MOUNT}/nas/jeff"
 chown -R "${JEFF_UID}:${JEFF_GID}" "${NAS_MOUNT}/nas/shared"
 chmod 770 "${NAS_MOUNT}/nas/shared"
 chown -R "${JEFF_UID}:${JEFF_GID}" "${NAS_MOUNT}/nas/jeff"

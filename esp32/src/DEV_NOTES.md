@@ -66,7 +66,7 @@ bash ~/PIHUB/scripts/unlock-nas.sh   # enter LUKS passphrase → NAS mounts + Do
 | **Verify NAS mounted** | SSH (Pi) | `df -h /mnt/nas` |
 | **Check LUKS status** | SSH (Pi) | `sudo cryptsetup status pivault-hdd` |
 | **Lock + unmount** (clean shutdown) | SSH (Pi) | `sudo umount /mnt/nas && sudo cryptsetup luksClose pivault-hdd` |
-| **List LUKS key slots** | SSH (Pi) | `sudo cryptsetup luksDump /dev/sda` |
+| **List LUKS key slots** | SSH (Pi) | `sudo cryptsetup luksDump /dev/sdc` |
 
 **First-time setup on Pi:**
 ```bash
