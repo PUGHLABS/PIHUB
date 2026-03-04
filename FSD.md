@@ -538,7 +538,7 @@ Development is organized into four phases, each building on the previous. Each p
 - [x] Create initial SQLite database schema (users, sessions, config)
 - [x] Deploy WireGuard for secure remote access (docker-compose.yml + scripts/setup-wireguard.sh)
 - [x] Set up ufw firewall rules (scripts/setup-ufw.sh — Fail2ban pending)
-- [ ] **Validate:** file upload/download via SMB and web, remote VPN access
+- [x] **Validate:** file upload/download via SMB and web, remote VPN access
 
 ### 7.2 Phase 2 Detail: Dashboard + Weather
 
@@ -556,7 +556,7 @@ Development is organized into four phases, each building on the previous. Each p
 - [x] Add min/max/avg summary cards for weather data
 - [x] Build weather data export (CSV/JSON)
 - [x] Connect frontend to live API data (system health from Pi)
-- [ ] **Validate:** weather data flows from ESP32 → API → SQLite → dashboard charts
+- [x] **Validate:** weather data flows from ESP32 → API → SQLite → dashboard charts
 
 ---
 
