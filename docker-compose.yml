@@ -58,25 +58,8 @@ services:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
-  # ──────────────────────────────────────────────
-  # Samba NAS shares
-  # ──────────────────────────────────────────────
-  samba:
-    image: linuxserver/samba:latest
-    container_name: pivault-samba
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ:-America/Los_Angeles}
-    volumes:
-      - /mnt/nas:/mnt/nas
-      - ./docker/samba/smb.conf:/config/smb.conf:ro
-    ports:
-      - "445:445"
-      - "137:137/udp"
-      - "138:138/udp"
-      - "139:139/tcp"
-    restart: unless-stopped
+  # NOTE: Samba runs natively on the Pi host (not in Docker).
+  # See scripts/setup-samba.sh — installs via apt, uses docker/samba/smb.conf.
 
   # ──────────────────────────────────────────────
   # WireGuard VPN
