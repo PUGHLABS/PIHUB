@@ -57,12 +57,13 @@ apt-get install -y dropbear-initramfs
 success "dropbear-initramfs installed."
 
 # ── Step 2: Copy authorized SSH key ──────────────────────────────────────────
-# Debian's dropbear-initramfs package uses /etc/dropbear-initramfs/ (NOT /etc/dropbear/initramfs/)
-DROPBEAR_KEYS_DIR="/etc/dropbear-initramfs"
+# dropbear-initramfs 2025.x on Debian 13 uses /etc/dropbear/initramfs/ (NOT /etc/dropbear-initramfs/)
+DROPBEAR_KEYS_DIR="/etc/dropbear/initramfs"
 mkdir -p "$DROPBEAR_KEYS_DIR"
 
 info "Copying SSH authorized_keys from: ${SSH_KEY_SOURCE}"
-cp "$SSH_KEY_SOURCE" "${DROPBEAR_KEYS_DIR}/authorized_keys"
+# Strip Windows CRLF line endings if present (key copied from Windows)
+sed 's/\r//' "$SSH_KEY_SOURCE" > "${DROPBEAR_KEYS_DIR}/authorized_keys"
 chmod 600 "${DROPBEAR_KEYS_DIR}/authorized_keys"
 success "Authorized keys copied."
 
@@ -71,7 +72,7 @@ KEY_COUNT=$(wc -l < "${DROPBEAR_KEYS_DIR}/authorized_keys")
 info "${KEY_COUNT} key(s) authorized for remote unlock."
 
 # ── Step 3: Configure dropbear ────────────────────────────────────────────────
-DROPBEAR_CONF="${DROPBEAR_KEYS_DIR}/config"
+DROPBEAR_CONF="${DROPBEAR_KEYS_DIR}/dropbear.conf"
 info "Writing dropbear configuration ..."
 
 cat > "$DROPBEAR_CONF" <<'EOF'
