@@ -9,8 +9,18 @@ import weatherRoutes from './routes/weather.js'
 import camerasRoutes from './routes/cameras.js'
 import mediaRoutes from './routes/media.js'
 import systemRoutes from './routes/system.js'
+import { getDb } from './db/sqlite.js'
+import { startAll as startAllCameras } from './services/cameraManager.js'
 
 const app = express()
+
+// Initialize DB (ensures schema is applied) then start camera processes
+try {
+  getDb()
+  startAllCameras()
+} catch (err) {
+  console.error('[APP] Camera startup error:', err.message)
+}
 
 // Middleware
 app.use(helmet())
