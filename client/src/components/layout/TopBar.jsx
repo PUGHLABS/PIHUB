@@ -1,6 +1,7 @@
-import { useLocation } from 'react-router-dom'
-import { HiOutlineMenu, HiOutlineBell, HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { HiOutlineMenu, HiOutlineBell, HiOutlineSun, HiOutlineMoon, HiOutlineLogout } from 'react-icons/hi'
 import { useTheme } from '../../context/ThemeContext'
+import { useAuth } from '../../context/AuthContext'
 
 const pageTitles = {
   '/': 'Dashboard',
@@ -13,8 +14,15 @@ const pageTitles = {
 
 export default function TopBar({ onMenuClick }) {
   const { dark, toggle } = useTheme()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const location = useLocation()
   const title = pageTitles[location.pathname] || 'PiVault'
+
+  function handleLogout() {
+    logout()
+    navigate('/login', { replace: true })
+  }
 
   return (
     <header className="flex items-center justify-between p-4 md:p-6">
@@ -48,6 +56,18 @@ export default function TopBar({ onMenuClick }) {
           <HiOutlineBell className="w-5 h-5" />
           <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--neu-accent)] rounded-full" />
         </button>
+
+        {/* User + logout */}
+        {user && (
+          <button
+            onClick={handleLogout}
+            className="neu-button p-3"
+            aria-label="Sign out"
+            title={`Sign out (${user.username})`}
+          >
+            <HiOutlineLogout className="w-5 h-5" />
+          </button>
+        )}
       </div>
     </header>
   )

@@ -14,6 +14,10 @@ export async function apiFetch(endpoint, options = {}) {
   })
 
   if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.removeItem('pivault-token')
+      window.dispatchEvent(new Event('pivault-logout'))
+    }
     const error = await res.json().catch(() => ({ message: res.statusText }))
     throw new Error(error.message || `API error: ${res.status}`)
   }
