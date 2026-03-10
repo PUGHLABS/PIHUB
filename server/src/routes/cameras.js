@@ -138,10 +138,19 @@ router.get('/:id/hls/:filename', requireAuth, (req, res) => {
 // ── Snapshot ──────────────────────────────────────────────────────────────────
 
 // GET /api/v1/cameras/:id/snapshot
-router.get('/:id/snapshot', requireAuth, (req, res) => {
+// Returns latest motion thumbnail instantly, or captures a live frame on demand
+router.get('/:id/snapshot', requireAuth, async (req, res) => {
+  // Prefer existing thumbnail (no extra FFmpeg call)
   const thumb = cameraManager.getLatestThumbnail(req.params.id)
-  if (!thumb) return res.status(404).json({ message: 'No snapshot available' })
-  res.sendFile(thumb)
+  if (thumb) return res.sendFile(thumb)
+
+  // Fall back to on-demand capture from sub-stream
+  try {
+    const snapPath = await cameraManager.captureSnapshot(req.params.id)
+    res.sendFile(snapPath)
+  } catch (err) {
+    res.status(503).json({ message: 'Snapshot not available', detail: err.message })
+  }
 })
 
 // ── Recordings ────────────────────────────────────────────────────────────────

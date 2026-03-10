@@ -1,6 +1,7 @@
 import { spawn } from 'child_process'
 import { mkdirSync, watch, statSync, readdirSync, unlinkSync } from 'fs'
 import { join } from 'path'
+import { tmpdir } from 'os'
 import { getDb } from '../db/sqlite.js'
 
 // ── Config ────────────────────────────────────────────────────────────────────
@@ -307,4 +308,50 @@ export function getLatestThumbnail(cameraId) {
   } catch {
     return null
   }
+}
+
+// Cache: { path, capturedAt }
+const snapshotCache = new Map()
+const SNAP_CACHE_TTL_MS = 30_000 // reuse for 30 seconds
+
+export function captureSnapshot(cameraId) {
+  return new Promise((resolve, reject) => {
+    // Return cached snapshot if fresh enough
+    const cached = snapshotCache.get(cameraId)
+    if (cached && Date.now() - cached.capturedAt < SNAP_CACHE_TTL_MS) {
+      return resolve(cached.path)
+    }
+
+    const cam = state.get(cameraId)
+    if (!cam) return reject(new Error('Camera not running'))
+
+    const db = getDb()
+    const camera = db.prepare('SELECT rtsp_sub FROM cameras WHERE id = ?').get(cameraId)
+    if (!camera) return reject(new Error('Camera not found'))
+
+    const outPath = join(tmpdir(), `pivault-snap-${cameraId}.jpg`)
+    const ffmpeg = spawn('ffmpeg', [
+      '-rtsp_transport', 'tcp',
+      '-i', camera.rtsp_sub,
+      '-vframes', '1',
+      '-qscale:v', '3',
+      '-y',
+      outPath,
+    ], { stdio: ['ignore', 'ignore', 'pipe'] })
+
+    const timer = setTimeout(() => {
+      ffmpeg.kill('SIGKILL')
+      reject(new Error('Snapshot timed out'))
+    }, 8000)
+
+    ffmpeg.on('exit', (code) => {
+      clearTimeout(timer)
+      if (code === 0) {
+        snapshotCache.set(cameraId, { path: outPath, capturedAt: Date.now() })
+        resolve(outPath)
+      } else {
+        reject(new Error(`ffmpeg exited with code ${code}`))
+      }
+    })
+  })
 }
