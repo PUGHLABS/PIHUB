@@ -44,7 +44,7 @@ export default function DashboardPage() {
                 >
                   <div className="relative">
                     <img
-                      src={`/api/v1/cameras/${cam.id}/snapshot`}
+                      src={`/api/v1/cameras/${cam.id}/snapshot?token=${localStorage.getItem('pivault-token')}`}
                       alt={cam.name}
                       className="w-full h-16 object-cover rounded-lg mb-1"
                       onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}

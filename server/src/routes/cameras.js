@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { join } from 'path'
 import { statSync } from 'fs'
 import { getDb } from '../db/sqlite.js'
-import { requireAuth, requireAdmin } from '../middleware/auth.js'
+import { requireAuth, requireAdmin, requireAuthMedia } from '../middleware/auth.js'
 import * as cameraManager from '../services/cameraManager.js'
 
 const router = Router()
@@ -144,7 +144,7 @@ router.get('/:id/hls/:filename', requireAuth, (req, res) => {
 
 // GET /api/v1/cameras/:id/snapshot
 // Returns latest motion thumbnail instantly, or captures a live frame on demand
-router.get('/:id/snapshot', requireAuth, async (req, res) => {
+router.get('/:id/snapshot', requireAuthMedia, async (req, res) => {
   // Prefer existing thumbnail (no extra FFmpeg call)
   const thumb = cameraManager.getLatestThumbnail(req.params.id)
   if (thumb) return res.sendFile(thumb)
@@ -159,7 +159,7 @@ router.get('/:id/snapshot', requireAuth, async (req, res) => {
 })
 
 // GET /api/v1/cameras/:id/motion/:eventId/thumbnail
-router.get('/:id/motion/:eventId/thumbnail', requireAuth, (req, res) => {
+router.get('/:id/motion/:eventId/thumbnail', requireAuthMedia, (req, res) => {
   const db = getDb()
   const event = db.prepare(
     'SELECT thumbnail_path FROM motion_events WHERE id = ? AND camera_id = ?'
