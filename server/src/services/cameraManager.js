@@ -385,14 +385,17 @@ export function captureSnapshot(cameraId) {
       reject(new Error('Snapshot timed out'))
     }, 8000)
 
-    ffmpeg.on('exit', (code) => {
+    ffmpeg.on('exit', () => {
       clearTimeout(timer)
-      if (code === 0) {
-        snapshotCache.set(cameraId, { path: outPath, capturedAt: Date.now() })
-        resolve(outPath)
-      } else {
-        reject(new Error(`ffmpeg exited with code ${code}`))
-      }
+      // Check file existence/size — ffmpeg -vframes 1 can exit non-zero even on success
+      try {
+        const stat = statSync(outPath)
+        if (stat.size > 0) {
+          snapshotCache.set(cameraId, { path: outPath, capturedAt: Date.now() })
+          return resolve(outPath)
+        }
+      } catch { /* file not written */ }
+      reject(new Error('Snapshot file not written'))
     })
   })
 }

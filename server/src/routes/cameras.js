@@ -129,6 +129,11 @@ router.get('/:id/hls/:filename', requireAuth, (req, res) => {
   const filePath = join(hlsDir, filename)
   try {
     statSync(filePath)
+    // Playlists must never be cached — segments can be cached (they're immutable)
+    if (filename.endsWith('.m3u8')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+      res.setHeader('Pragma', 'no-cache')
+    }
     res.sendFile(filePath)
   } catch {
     res.status(404).json({ message: 'HLS file not found' })
