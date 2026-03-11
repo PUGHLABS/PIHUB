@@ -182,7 +182,7 @@ export default function CamerasPage() {
               <div key={evt.id} className="neu-inset p-2 text-center">
                 {evt.thumbnail_path ? (
                   <img
-                    src={`/api/v1/cameras/${selectedCamera.id}/snapshot`}
+                    src={`/api/v1/cameras/${selectedCamera.id}/motion/${evt.id}/thumbnail`}
                     alt="motion"
                     className="w-full h-14 object-cover rounded mb-1"
                     loading="lazy"

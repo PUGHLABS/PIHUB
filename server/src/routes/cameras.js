@@ -153,6 +153,23 @@ router.get('/:id/snapshot', requireAuth, async (req, res) => {
   }
 })
 
+// GET /api/v1/cameras/:id/motion/:eventId/thumbnail
+router.get('/:id/motion/:eventId/thumbnail', requireAuth, (req, res) => {
+  const db = getDb()
+  const event = db.prepare(
+    'SELECT thumbnail_path FROM motion_events WHERE id = ? AND camera_id = ?'
+  ).get(req.params.eventId, req.params.id)
+
+  if (!event?.thumbnail_path) return res.status(404).json({ message: 'Thumbnail not found' })
+
+  try {
+    statSync(event.thumbnail_path)
+    res.sendFile(event.thumbnail_path)
+  } catch {
+    res.status(404).json({ message: 'Thumbnail file not found on disk' })
+  }
+})
+
 // ── Recordings ────────────────────────────────────────────────────────────────
 
 // GET /api/v1/cameras/:id/recordings?date=YYYY-MM-DD&limit=100

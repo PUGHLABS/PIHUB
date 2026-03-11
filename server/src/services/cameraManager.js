@@ -68,6 +68,7 @@ function startCamera(camera) {
     motionDetector: null,
     restartTimers: [],
     watchers: [],
+    scanIntervals: [],
     lastSeen: null,
   }
   state.set(id, cam)
@@ -184,6 +185,48 @@ function startCamera(camera) {
     cam.restartTimers.push(timer)
   }
 
+  // ── 4. Periodic recording scanner ─────────────────────────────────────────
+  // FFmpeg creates .mp4 files on disk; this scanner syncs them into the DB
+  function syncRecordings() {
+    const camRecDir = join(REC_DIR, id)
+    const db = getDb()
+    try {
+      const dateDirs = readdirSync(camRecDir)
+      for (const dateDir of dateDirs) {
+        const fullDateDir = join(camRecDir, dateDir)
+        let files
+        try { files = readdirSync(fullDateDir).filter(f => f.endsWith('.mp4')) } catch { continue }
+        for (const file of files) {
+          const fullPath = join(fullDateDir, file)
+          try {
+            const stat = statSync(fullPath)
+            if (stat.size < 65536) continue // skip tiny/incomplete files (<64KB)
+            const existing = db.prepare('SELECT id FROM recordings WHERE file_path = ?').get(fullPath)
+            if (!existing) {
+              // Filename is HH-MM-SS.mp4; dateDir is YYYY-MM-DD
+              const match = file.match(/^(\d{2})-(\d{2})-(\d{2})\.mp4$/)
+              const startedAt = match
+                ? `${dateDir}T${match[1]}:${match[2]}:${match[3]}`
+                : new Date().toISOString()
+              db.prepare(
+                'INSERT OR IGNORE INTO recordings (camera_id, started_at, file_path, size_bytes) VALUES (?, ?, ?, ?)'
+              ).run(id, startedAt, fullPath, stat.size)
+              log(id, `Indexed recording: ${dateDir}/${file}`)
+            } else {
+              // Keep size up to date for the currently-writing file
+              db.prepare('UPDATE recordings SET size_bytes = ? WHERE file_path = ?')
+                .run(stat.size, fullPath)
+            }
+          } catch { /* file may be locked/deleted */ }
+        }
+      }
+    } catch { /* no recordings dir yet */ }
+  }
+
+  // Scan once after 30s (let FFmpeg write the first segment) then every 5 min
+  cam.scanIntervals.push(setTimeout(syncRecordings, 30_000))
+  cam.scanIntervals.push(setInterval(syncRecordings, 5 * 60 * 1000))
+
   startRecorder()
   startStreamer()
   startMotionDetector()
@@ -195,6 +238,7 @@ function stopCamera(id) {
   if (!cam) return
 
   for (const timer of cam.restartTimers) clearTimeout(timer)
+  for (const t of cam.scanIntervals) { clearTimeout(t); clearInterval(t) }
   for (const w of cam.watchers) { try { w.close() } catch {} }
 
   for (const proc of [cam.recorder, cam.streamer, cam.motionDetector]) {
@@ -321,9 +365,6 @@ export function captureSnapshot(cameraId) {
     if (cached && Date.now() - cached.capturedAt < SNAP_CACHE_TTL_MS) {
       return resolve(cached.path)
     }
-
-    const cam = state.get(cameraId)
-    if (!cam) return reject(new Error('Camera not running'))
 
     const db = getDb()
     const camera = db.prepare('SELECT rtsp_sub FROM cameras WHERE id = ?').get(cameraId)
