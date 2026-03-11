@@ -1,7 +1,8 @@
 import NeuButton from '../ui/NeuButton'
 
 export default function RecordingPlayer({ recording, cameraId, onClose }) {
-  const src = `/api/v1/cameras/${cameraId}/recordings/${recording.id}/file`
+  const token = localStorage.getItem('pivault-token')
+  const src = `/api/v1/cameras/${cameraId}/recordings/${recording.id}/file?token=${token}`
   const filename = recording.file_path?.split('/').pop() || 'recording.mp4'
   const startedAt = new Date(recording.started_at).toLocaleString()
 

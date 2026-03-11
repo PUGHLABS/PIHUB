@@ -199,7 +199,7 @@ router.get('/:id/recordings', requireAuth, (req, res) => {
 })
 
 // GET /api/v1/cameras/:id/recordings/:recId/file
-router.get('/:id/recordings/:recId/file', requireAuth, (req, res) => {
+router.get('/:id/recordings/:recId/file', requireAuthMedia, (req, res) => {
   const db = getDb()
   const rec = db.prepare(
     'SELECT * FROM recordings WHERE id = ? AND camera_id = ?'
