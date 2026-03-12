@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3'
-import { readFileSync } from 'fs'
+import { readFileSync, mkdirSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 import { config } from '../config/index.js'
@@ -10,6 +10,7 @@ let db
 
 export function getDb() {
   if (!db) {
+    mkdirSync(dirname(config.dbPath), { recursive: true })
     db = new Database(config.dbPath)
     db.pragma('journal_mode = WAL')
     db.pragma('foreign_keys = ON')

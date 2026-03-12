@@ -301,9 +301,14 @@ export function startAll() {
   const db = getDb()
   const cameras = db.prepare('SELECT * FROM cameras WHERE enabled = 1').all()
 
-  ensureDir(HLS_DIR)
-  ensureDir(REC_DIR)
-  ensureDir(THM_DIR)
+  try {
+    ensureDir(HLS_DIR)
+    ensureDir(REC_DIR)
+    ensureDir(THM_DIR)
+  } catch (err) {
+    console.error(`[CAM] NAS dirs unavailable (${err.message}) — cameras will not start until NAS is mounted`)
+    return
+  }
 
   for (const camera of cameras) {
     try {
