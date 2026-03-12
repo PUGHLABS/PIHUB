@@ -17,9 +17,11 @@ const METRICS = [
   {
     key: 'temperature_c',
     label: 'Temperature',
-    unit: '°C',
+    unit: '°F',
     color: '#f59e0b',
-    format: v => v != null ? `${v.toFixed(1)}°C` : '—',
+    transform: v => v != null ? v * 9 / 5 + 32 : null,
+    format: v => v != null ? `${v.toFixed(1)}°F` : '—',
+    tickFormat: v => `${v.toFixed(0)}°`,
     chartType: 'line',
   },
   {
@@ -27,23 +29,30 @@ const METRICS = [
     label: 'Humidity',
     unit: '%',
     color: '#3b82f6',
+    transform: v => v,
     format: v => v != null ? `${v.toFixed(1)}%` : '—',
+    tickFormat: v => `${v}%`,
     chartType: 'line',
   },
   {
     key: 'pressure_hpa',
     label: 'Pressure',
-    unit: 'hPa',
+    unit: '"Hg',
     color: '#8b5cf6',
-    format: v => v != null ? `${v.toFixed(1)} hPa` : '—',
+    transform: v => v != null ? Math.round(v * 0.02953 * 1000) / 1000 : null,
+    format: v => v != null ? `${v.toFixed(2)}"` : '—',
+    tickFormat: v => `${v.toFixed(2)}`,
     chartType: 'line',
+    domain: [29.00, 31.00],
   },
   {
     key: 'wind_speed_kmh',
     label: 'Wind',
-    unit: 'km/h',
+    unit: ' mph',
     color: '#10b981',
-    format: v => v != null ? `${v.toFixed(1)} km/h` : '—',
+    transform: v => v != null ? Math.round(v * 0.621371 * 10) / 10 : null,
+    format: v => v != null ? `${v.toFixed(1)} mph` : '—',
+    tickFormat: v => `${v}`,
     chartType: 'line',
   },
   {
@@ -51,7 +60,9 @@ const METRICS = [
     label: 'Rain',
     unit: ' ml',
     color: '#06b6d4',
+    transform: v => v,
     format: v => v != null ? `${v.toFixed(2)} ml` : '—',
+    tickFormat: v => `${v}ml`,
     chartType: 'bar',
   },
 ]
@@ -101,12 +112,12 @@ export default function WeatherChartPanel() {
 
   const chartData = useMemo(() => {
     if (metricKey === 'rain_ml') {
-      const withRain = computeRainData(rawData)
-      // For rain, show all points (even 0s tell the story)
-      return withRain
+      return computeRainData(rawData)
     }
-    return rawData.filter(d => d[metricKey] != null)
-  }, [rawData, metricKey])
+    return rawData
+      .filter(d => d[metricKey] != null)
+      .map(d => ({ ...d, [metricKey]: metric.transform(d[metricKey]) }))
+  }, [rawData, metricKey, metric])
 
   const hasRain = metricKey === 'rain_ml' && chartData.some(d => d.rain_ml > 0)
 
@@ -178,7 +189,7 @@ export default function WeatherChartPanel() {
                   tickLine={false}
                   axisLine={false}
                   width={45}
-                  tickFormatter={v => `${v}ml`}
+                  tickFormatter={metric.tickFormat}
                 />
                 <Tooltip content={props => <CustomTooltip {...props} metric={metric} range={range} />} />
                 <Bar dataKey="rain_ml" isAnimationActive={false} radius={[2, 2, 0, 0]}>
@@ -203,11 +214,12 @@ export default function WeatherChartPanel() {
                   interval="preserveStartEnd"
                 />
                 <YAxis
+                  domain={metric.domain ?? ['auto', 'auto']}
                   tick={{ fontSize: 10, fill: 'var(--neu-text-muted)' }}
                   tickLine={false}
                   axisLine={false}
                   width={45}
-                  tickFormatter={v => `${v}${metric.unit}`}
+                  tickFormatter={metric.tickFormat}
                 />
                 <Tooltip content={props => <CustomTooltip {...props} metric={metric} range={range} />} />
                 <Line
