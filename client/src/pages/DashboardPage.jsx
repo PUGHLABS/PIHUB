@@ -1,14 +1,64 @@
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NeuCard from '../components/ui/NeuCard'
 import NeuButton from '../components/ui/NeuButton'
 import SystemHealthPanel from '../components/widgets/SystemHealthPanel'
 import WeatherWidget from '../components/widgets/WeatherWidget'
 import useCameras from '../hooks/useCameras'
-import { HiOutlineUpload, HiOutlineVideoCamera, HiOutlineFilm } from 'react-icons/hi'
+import { apiFetch, uploadFiles } from '../lib/api'
+import { formatBytes, getFileKind } from '../lib/fileTypes'
+import {
+  HiOutlineUpload,
+  HiOutlineVideoCamera,
+  HiOutlineFilm,
+  HiOutlinePhotograph,
+  HiOutlineMusicNote,
+  HiOutlineDocument,
+} from 'react-icons/hi'
+
+const FILE_ICONS = {
+  image: HiOutlinePhotograph,
+  video: HiOutlineFilm,
+  audio: HiOutlineMusicNote,
+  file: HiOutlineDocument,
+}
 
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { cameras } = useCameras(30000)
+  const [recentFiles, setRecentFiles] = useState([])
+  const [uploading, setUploading] = useState(false)
+  const uploadInputRef = useRef(null)
+
+  const loadRecentFiles = async () => {
+    try {
+      const data = await apiFetch('/files')
+      const files = data.items
+        .filter(item => item.type === 'file')
+        .sort((a, b) => new Date(b.modified) - new Date(a.modified))
+        .slice(0, 4)
+      setRecentFiles(files)
+    } catch {
+      setRecentFiles([])
+    }
+  }
+
+  useEffect(() => { loadRecentFiles() }, [])
+
+  async function handleUpload(e) {
+    const files = Array.from(e.target.files)
+    e.target.value = ''
+    if (files.length === 0) return
+    setUploading(true)
+    try {
+      await uploadFiles('/files/upload', files)
+      await loadRecentFiles()
+    } catch (err) {
+      alert(`Upload failed: ${err.message}`)
+    } finally {
+      setUploading(false)
+    }
+  }
 
   return (
     <div>
@@ -64,28 +114,46 @@ export default function DashboardPage() {
         {/* Recent Files */}
         <NeuCard>
           <h2 className="font-semibold mb-4 text-[var(--neu-accent)]">Recent Files</h2>
-          <div className="space-y-2">
-            {['report.pdf', 'photo_001.jpg', 'backup.tar.gz', 'notes.md'].map((file) => (
-              <div key={file} className="neu-subtle p-3 flex items-center gap-3">
-                <span className="text-sm">{file}</span>
-              </div>
-            ))}
-          </div>
+          {recentFiles.length === 0 ? (
+            <p className="text-sm text-[var(--neu-text-muted)]">No files yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {recentFiles.map(file => {
+                const Icon = FILE_ICONS[getFileKind(file.name)]
+                return (
+                  <div
+                    key={file.name}
+                    className="neu-subtle p-3 flex items-center gap-3 cursor-pointer hover:scale-[1.01] transition-transform rounded-xl"
+                    onClick={() => navigate('/files')}
+                  >
+                    <Icon className="w-4 h-4 text-[var(--neu-accent)] shrink-0" />
+                    <span className="text-sm truncate flex-1">{file.name}</span>
+                    <span className="text-xs text-[var(--neu-text-muted)] shrink-0">{formatBytes(file.size)}</span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </NeuCard>
 
         {/* Quick Actions */}
         <NeuCard>
           <h2 className="font-semibold mb-4 text-[var(--neu-accent)]">Quick Actions</h2>
           <div className="space-y-3">
-            <NeuButton className="w-full flex items-center justify-center gap-2">
+            <NeuButton
+              className="w-full flex items-center justify-center gap-2"
+              onClick={() => uploadInputRef.current?.click()}
+              disabled={uploading}
+            >
               <HiOutlineUpload className="w-4 h-4" />
-              Upload File
+              {uploading ? 'Uploading...' : 'Upload File'}
             </NeuButton>
+            <input ref={uploadInputRef} type="file" multiple className="hidden" onChange={handleUpload} />
             <NeuButton className="w-full flex items-center justify-center gap-2" onClick={() => navigate('/cameras')}>
               <HiOutlineVideoCamera className="w-4 h-4" />
               View Cameras
             </NeuButton>
-            <NeuButton className="w-full flex items-center justify-center gap-2">
+            <NeuButton className="w-full flex items-center justify-center gap-2" onClick={() => navigate('/media')}>
               <HiOutlineFilm className="w-4 h-4" />
               Browse Media
             </NeuButton>

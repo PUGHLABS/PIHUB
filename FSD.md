@@ -600,6 +600,8 @@ The following features are out of scope for the initial release but are document
 - Automated SSL certificate renewal via Certbot + Let's Encrypt
 - Multi-site support: sync data between two PiVault instances
 - Voice control integration (Home Assistant + Alexa/Google)
+- Drag-and-drop upload/browse panel in PiVault web app (complements Samba shares, useful for mobile/remote access without mapping a network drive; writes into `/mnt/nas/nas/shared`)
+- Support for additional USB drives beyond the primary LUKS-encrypted HDD (e.g. old spare disks for backup target or extra shared storage). Requires generalizing `setup-luks.sh` (currently hardcoded to `MAPPER_NAME=pivault-hdd`, `MOUNT_POINT=/mnt/nas`) to accept mapper name/mount point as parameters, plus its own crypttab/fstab entries. Use a powered USB hub for spinning disks — Pi USB power isn't reliable for that.
 
 ---
 

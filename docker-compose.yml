@@ -34,12 +34,16 @@ services:
       # On the Pi: DB lives on the encrypted NAS drive.
       # For local dev, fall back to named volume via: docker-compose.override.yml
       - /mnt/nas/docker/server-data:/app/data
+      - /mnt/nas/nas/shared:/app/files
+      - /mnt/nas/media:/app/media
     environment:
       - PORT=3001
       - JWT_SECRET=${JWT_SECRET:-dev-secret-change-in-production}
       - JWT_EXPIRY=${JWT_EXPIRY:-24h}
       - DB_PATH=/app/data/pivault.db
       - WX_API_KEY=${WX_API_KEY:-}
+      - FILES_PATH=/app/files
+      - MEDIA_PATH=/app/media
     command: npm run dev
     restart: unless-stopped
 
