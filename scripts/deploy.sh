@@ -34,7 +34,9 @@ echo "════════════════════════�
 echo ""
 
 # ── Pull latest code ─────────────────────────────────────────────────────────
-if [[ -n "$(git status --porcelain)" ]]; then
+# --untracked-files=no: stray untracked files shouldn't block a deploy, only
+# uncommitted changes to files git already tracks.
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
   die "Working tree has uncommitted changes — commit, stash, or discard them before deploying."
 fi
 git pull origin main
