@@ -1,0 +1,19 @@
+# Local development overrides — NOT auto-merged by Compose (only docker-compose.override.yml
+# is). Use explicitly: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Restores named volumes for server data, files, and media so the API works without /mnt/nas.
+# (Renamed from docker-compose.override.yml, which Compose merges automatically on every
+# `docker compose up` — including on the Pi, where it was silently replacing the real
+# /mnt/nas bind mounts with empty local volumes.)
+services:
+  server:
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+      - server-data:/app/data
+      - files-data:/app/files
+      - media-data:/app/media
+
+volumes:
+  server-data:
+  files-data:
+  media-data:
