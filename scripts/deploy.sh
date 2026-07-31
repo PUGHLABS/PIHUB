@@ -40,16 +40,19 @@ fi
 git pull origin main
 info "Code updated"
 
-# ── Rebuild server image ─────────────────────────────────────────────────────
-docker compose build server
-info "Server image rebuilt"
+# ── Rebuild images ────────────────────────────────────────────────────────────
+docker compose build server client
+info "Images rebuilt"
 
 # ── Rebuild client production bundle ─────────────────────────────────────────
 docker compose run --rm client npm run build
 info "Client bundle rebuilt (client/dist)"
 
 # ── Recreate containers ──────────────────────────────────────────────────────
-docker compose up -d
+# Scoped to server/client only — nginx and wireguard don't need to bounce on
+# every deploy. -V renews anonymous volumes (e.g. /app/node_modules) so a
+# rebuilt image's dependencies can't get shadowed by stale container content.
+docker compose up -d --force-recreate -V server client
 info "Containers recreated"
 
 echo ""
